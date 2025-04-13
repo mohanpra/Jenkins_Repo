@@ -1,0 +1,21 @@
+version: 0.2
+
+env:
+  variables:
+    ECR_REPO: "<account_id>.dkr.ecr.us-east-1.amazonaws.com/jenkins-custom"
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging into ECR...
+      - $(aws ecr get-login --no-include-email --region us-east-1)
+  build:
+    commands:
+      - echo Building Docker image...
+      - docker build -t jenkins-custom .
+      - docker tag jenkins-custom:latest $ECR_REPO:latest
+  post_build:
+    commands:
+      - echo Pushing image to ECR...
+      - docker push $ECR_REPO:latest
+
